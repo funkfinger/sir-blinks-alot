@@ -1,3 +1,12 @@
+/*
+
+very closely based / copied from the FastLED examples and / or additiopns from Aaron Liddiment
+https://github.com/FastLED/FastLED
+https://github.com/AaronLiddiment/RGBLEDS
+
+*/
+
+
 #include <FastLED.h>
 
 #define LED_PIN  2
@@ -9,43 +18,15 @@
 #define HEIGHT 10
 #define BRIGHTNESS 100
 #define NUM_LEDS (WIDTH * HEIGHT)
-
+#define UPDATES_PER_SECOND 100
 
 const uint8_t kMatrixWidth = WIDTH;
 const uint8_t kMatrixHeight = HEIGHT;
 
-// Param for different pixel layouts
 const bool    kMatrixSerpentineLayout = true;
 
-
-
-//CRGB leds[NUM_LEDS];
 CRGB leds_plus_safety_pixel[ NUM_LEDS + 1];
 CRGB* leds( leds_plus_safety_pixel + 1);
-
-//CRGB* leds( leds_plus_safety_pixel + 1);
-
-
-#define UPDATES_PER_SECOND 100
-
-// This example shows several ways to set up and use 'palettes' of colors
-// with FastLED.
-//
-// These compact palettes provide an easy way to re-colorize your 
-// animation on the fly, quickly, easily, and with low overhead.
-//
-// USING palettes is MUCH simpler in practice than in theory, so first just
-// run this sketch, and watch the pretty lights as you then read through 
-// the code.  Although this sketch has eight (or more) different color schemes,
-// the entire sketch compiles down to about 6.5K on AVR.
-//
-// FastLED provides a few pre-configured color palettes, and makes it
-// extremely easy to make up your own color schemes with palettes.
-//
-// Some notes on the more abstract 'theory and practice' of 
-// FastLED compact palettes are at the bottom of this file.
-
-
 
 CRGBPalette16 currentPalette;
 TBlendType    currentBlending;
@@ -57,8 +38,6 @@ extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 void setup() {
   delay( 3000 ); // power-up safety delay
   FastLED.addLeds<CHIPSET, LED_PIN, CLOCK_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-
-//  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness(  BRIGHTNESS );
   
   currentPalette = RainbowColors_p;
