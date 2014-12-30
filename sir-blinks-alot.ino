@@ -39,45 +39,64 @@ extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 void setup() {
   delay( 3000 ); // power-up safety delay
   Serial.begin(9600);
-  Serial.println("setup");
-  
+  Serial.println("setup");  
+
   FastLED.addLeds<CHIPSET, LED_PIN, CLOCK_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness(  BRIGHTNESS );
   
   currentPalette = RainbowColors_p;
   currentBlending = BLEND;
   
-  Timer1.initialize(100); // set a timer of length 100000 microseconds (or 0.1 sec - or 10Hz => the led will blink 5 times, 5 cycles of on-and-off, per second)
-  Timer1.attachInterrupt( switchPattern ); // attach the service routine here
+//  Timer1.initialize(10000); // set a timer of length 100000 microseconds (or 0.1 sec - or 10Hz => the led will blink 5 times, 5 cycles of on-and-off, per second)
+//  Timer1.attachInterrupt( switchPattern ); // attach the service routine here
   
 }
 
-uint32_t patternShiftCounter = 0;
+uint16_t patternTimesCounter = 0;
+uint16_t patternCycles = 1000;
+uint8_t patternIndex = 3;
 
 
 void loop() {
+  switchPattern();
 }
 
 void switchPattern() {
-  Serial.println(patternShiftCounter);
-  patternShiftCounter++;
-  switch (patternShiftCounter) {
+  Serial.println("switchPattern");
+  patternTimesCounter = 0;
+  patternIndex++;
+  switch (patternIndex) {
     case 1:
-      xyLoop();
-      patternShiftCounter = 0;
+      Serial.println("one");
+      paletteLoop();
       break;
-    case 3:
-      FastLED.showColor(CRGB::Lime);
-      FastLED.show();
+    case 2:
+      Serial.println("two");
+      xyLoop();
       break;
     default:
-      paletteLoop(); 
+      Serial.println("default");
+      solidColorLoop();
+      patternIndex = 0;
+      break;
   }
   
 }
 
+void solidColorLoop() {
+  FastLED.clear();
+  while (patternTimesCounter < patternCycles) {
+    patternTimesCounter = patternTimesCounter + 100;
+    FastLED.showColor(CHSV(random(255), 255, 255));
+    //FastLED.show();
+    delay(500);
+  }
+}
+
+
 void paletteLoop() {
-  while (true) {
+  while (patternTimesCounter < patternCycles) {
+    patternTimesCounter++;
     ChangePalettePeriodically();
   
     static uint8_t startIndex = 0;
@@ -91,7 +110,8 @@ void paletteLoop() {
 }
 
 void xyLoop() {
-  while (true) {
+  while (patternTimesCounter < patternCycles) {
+    patternTimesCounter++;
     uint32_t ms = millis();
     int32_t yHueDelta32 = ((int32_t)cos16( ms * (27/1) ) * (350 / kMatrixWidth));
     int32_t xHueDelta32 = ((int32_t)cos16( ms * (39/1) ) * (310 / kMatrixHeight));
